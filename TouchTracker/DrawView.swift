@@ -137,6 +137,9 @@ class DrawView: UIView {
         tapRecognizer.delaysTouchesBegan = true
         tapRecognizer.require(toFail: doubleTapRecognizer)
         addGestureRecognizer(tapRecognizer)
+        
+        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(DrawView.longPress(_:)))
+        addGestureRecognizer(longPressRecognizer)
     }
     
     @objc func doubleTap(_ gestureRecognizer: UIGestureRecognizer) {
@@ -187,6 +190,23 @@ class DrawView: UIView {
             // Redraw everything
             setNeedsDisplay()
         }
+    }
+    
+    @objc func longPress(_ gestureRecognizer: UIGestureRecognizer) {
+        print("Recognize a long press")
+        
+        if gestureRecognizer.state == .began {
+            let point = gestureRecognizer.location(in: self)
+            selectedLineIndex = indexOfLine(at: point)
+            
+            if selectedLineIndex != nil {
+                currentLines.removeAll()
+            }
+        } else if gestureRecognizer.state == .ended {
+            selectedLineIndex = nil
+        }
+        
+        setNeedsDisplay()
     }
     
     func indexOfLine(at point: CGPoint) -> Int? {
